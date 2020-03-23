@@ -64,7 +64,19 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        running = True
+
+        while running:
+            # LDI
+            if self.ram[self.pc] == 0b10000010:
+                self.register[int(str(self.ram[self.pc + 1]), 2)
+                              ] = self.ram[self.pc + 2]
+                self.pc += 3
+
+            # HLT
+            elif self.ram[self.pc] == 0b00000001:
+                self.pc = 0
+                running = False
 
     def ram_read(self, address):
         return self.ram[int(str(address), 2)]
