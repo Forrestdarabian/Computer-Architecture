@@ -73,6 +73,11 @@ class CPU:
                               ] = self.ram[self.pc + 2]
                 self.pc += 3
 
+            # PRN
+            elif self.ram[self.pc] == 0b01000111:
+                print(self.register[int(str(self.ram[self.pc + 1]), 2)])
+                self.pc += 2
+
             # HLT
             elif self.ram[self.pc] == 0b00000001:
                 self.pc = 0
