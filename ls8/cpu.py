@@ -94,24 +94,45 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        IR = self.pc
         running = True
 
         while running:
-            # LDI
-            if self.ram[self.pc] == 0b10000010:
-                self.register[int(str(self.ram[self.pc + 1]), 2)
-                              ] = self.ram[self.pc + 2]
-                self.pc += 3
+            opcode = self.ram_read(IR)
+            operand_a = self.ram_read(IR + 1)
+            operand_b = self.ram_read(IR + 2)
+            if opcode == LDI:
+                self.reg[operand_a] = operand_b
+                IR += 3
+            elif opcode == PRN:
+                print(self.reg[operand_a])
+                IR += 2
+            elif opcode == MUL:
+                self.alu(opcode, operand_a, operand_b)
+                IR += 3
+            elif opcode == HLT:
+                sys.exit(0)
+            else:
+                print("OPCODE not recognized.")
+                sys.exit(1)
 
-            # PRN
-            elif self.ram[self.pc] == 0b01000111:
-                print(self.register[int(str(self.ram[self.pc + 1]), 2)])
-                self.pc += 2
 
-            # HLT
-            elif self.ram[self.pc] == 0b00000001:
-                self.pc = 0
-                running = False
+
+            # # LDI
+            # if self.ram[self.pc] == 0b10000010:
+            #     self.register[int(str(self.ram[self.pc + 1]), 2)
+            #                   ] = self.ram[self.pc + 2]
+            #     self.pc += 3
+
+            # # PRN
+            # elif self.ram[self.pc] == 0b01000111:
+            #     print(self.register[int(str(self.ram[self.pc + 1]), 2)])
+            #     self.pc += 2
+
+            # # HLT
+            # elif self.ram[self.pc] == 0b00000001:
+            #     self.pc = 0
+            #     running = False
 
     def ram_read(self, address):
         return self.ram[int(str(address), 2)]
