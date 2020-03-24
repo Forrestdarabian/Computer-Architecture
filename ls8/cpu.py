@@ -2,6 +2,11 @@
 
 import sys
 
+LDI = 0b10000010
+PRN = 0b01000111
+HLT = 0b00000001
+MUL = 0b10100010
+
 
 class CPU:
     """Main CPU class."""
@@ -12,33 +17,58 @@ class CPU:
         self.register = [0] * 8
         self.pc = 0
 
-    def load(self):
+    def load(self, filename):
         """Load a program into memory."""
 
-        address = 0
+        # address = 0
 
-        # For now, we've just hardcoded a program:
+        # # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010,  # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111,  # PRN R0
+        #     0b00000000,
+        #     0b00000001,  # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+
+        try:
+            address = 0
+            # open the file
+            with open(sys.argv[1]) as f:
+                # Read all the lines
+                for line in f:
+                     # Parse out the comments
+                     comment_split = line.strip().split("#")
+                      # cast the numbers from strings to ints
+                      value = comment_split[0].strip()
+                       # ignore blank lines
+                       if value == "":
+                            continue
+                        instruction = int(value, 2)
+                        # populate a memory array
+                        self.ram[address] = instruction
+                        address += 1
+
+        except FileNotFoundError:
+            print("File not found")
+            sys.exit(2)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        # elif op == "SUB": etc
+        # multiply
+        elif op == MUL:
+            self.reg[reg_a] *= self.reg[reg_b]
+            return self.reg[reg_a]
         else:
             raise Exception("Unsupported ALU operation")
 
